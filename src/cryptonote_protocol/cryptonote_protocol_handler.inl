@@ -2441,7 +2441,7 @@ skip:
         }
       }
       MGINFO_YELLOW(ENDL << "**********************************************************************" << ENDL
-        << "You are now synchronized with the network. You may now start monero-wallet-cli." << ENDL
+        << "You are now synchronized with the network. You may now start aurumcpu-wallet-cli." << ENDL
         << ENDL
         << "Use the \"help\" command to see the list of available commands." << ENDL
         << "**********************************************************************");
@@ -2888,7 +2888,7 @@ skip:
       m_core.set_target_blockchain_height(target);
       if (target == 0 && context.m_state > cryptonote_connection_context::state_before_handshake && !m_stopping)
       {
-        MCWARNING("global", "monerod is now disconnected from the network");
+        MCWARNING("global", "aurumcpud is now disconnected from the network");
         m_ask_for_txpool_complement = true;
       }
     }

@@ -270,7 +270,7 @@ invokes cmake commands as needed.
 
 * Add `PATH="$PATH:$HOME/aurumcpu/build/release/bin"` to `.profile`
 
-* Run AurumCPU with `monerod --detach`
+* Run AurumCPU with `aurumcpud --detach`
 
 * **Optional**: build and run the test suite to verify the binaries:
 
@@ -339,7 +339,7 @@ Tested on a Raspberry Pi 5B with a clean installation of Raspberry Pi OS (64-bit
 
 * Run `source $HOME/.profile`
 
-* Run AurumCPU with `monerod --detach`
+* Run AurumCPU with `aurumcpud --detach`
 
 * You may wish to reduce the size of the swap file after the build has finished, and delete the boost directory from your home directory
 
@@ -584,17 +584,17 @@ Packages are available for
 
 Packaging for your favorite distribution would be a welcome contribution!
 
-## Running monerod
+## Running aurumcpud
 
 The build places the binary in `bin/` sub-directory within the build directory
 from which cmake was invoked (repository root by default). To run in the
 foreground:
 
 ```bash
-./bin/monerod
+./bin/aurumcpud
 ```
 
-To list all available options, run `./bin/monerod --help`.  Options can be
+To list all available options, run `./bin/aurumcpud --help`.  Options can be
 specified either on the command line or in a configuration file passed by the
 `--config-file` argument.  To specify an option in the configuration file, add
 a line with the syntax `argumentname=value`, where `argumentname` is the name
@@ -603,18 +603,18 @@ of the argument without the leading dashes, for example, `log-level=1`.
 To run in background:
 
 ```bash
-./bin/monerod --log-file monerod.log --detach
+./bin/aurumcpud --log-file aurumcpud.log --detach
 ```
 
 To run as a systemd service, copy
-[monerod.service](utils/systemd/monerod.service) to `/etc/systemd/system/` and
-[monerod.conf](utils/conf/monerod.conf) to `/etc/`. The [example
-service](utils/systemd/monerod.service) assumes that the user `aurumcpu` exists
+[aurumcpud.service](utils/systemd/aurumcpud.service) to `/etc/systemd/system/` and
+[aurumcpud.conf](utils/conf/aurumcpud.conf) to `/etc/`. The [example
+service](utils/systemd/aurumcpud.service) assumes that the user `aurumcpu` exists
 and its home is the data directory specified in the [example
-config](utils/conf/monerod.conf).
+config](utils/conf/aurumcpud.conf).
 
 If you're on Mac, you may need to add the `--max-concurrency 1` option to
-aurumcpu-wallet-cli, and possibly monerod, if you get crashes refreshing.
+aurumcpu-wallet-cli, and possibly aurumcpud, if you get crashes refreshing.
 
 ## Internationalization
 
@@ -632,16 +632,16 @@ While AurumCPU isn't made to integrate with Tor, it can be used wrapped with tor
 setting the following configuration parameters and environment variables:
 
 * `--p2p-bind-ip 127.0.0.1` on the command line or `p2p-bind-ip=127.0.0.1` in
-  monerod.conf to disable listening for connections on external interfaces.
-* `--no-igd` on the command line or `no-igd=1` in monerod.conf to disable IGD
+  aurumcpud.conf to disable listening for connections on external interfaces.
+* `--no-igd` on the command line or `no-igd=1` in aurumcpud.conf to disable IGD
   (UPnP port forwarding negotiation), which is pointless with Tor.
 * If you use the wallet with a Tor daemon via the loopback IP (eg, 127.0.0.1:9050),
   then use `--untrusted-daemon` unless it is your own hidden service.
 
-Example command line to start monerod through Tor:
+Example command line to start aurumcpud through Tor:
 
 ```bash
-monerod --proxy 127.0.0.1:9050 --p2p-bind-ip 127.0.0.1 --no-igd
+aurumcpud --proxy 127.0.0.1:9050 --p2p-bind-ip 127.0.0.1 --no-igd
 ```
 
 A helper script is in contrib/tor/aurumcpu-over-tor.sh. It assumes Tor is installed
@@ -655,7 +655,7 @@ allow inbound connections. Full example:
 
 ```bash
 sudo iptables -I OUTPUT 2 -p tcp -d 127.0.0.1 -m tcp --dport 18081 -j ACCEPT
-DNS_PUBLIC=tcp torsocks ./monerod --p2p-bind-ip 127.0.0.1 --no-igd --rpc-bind-ip 127.0.0.1 \
+DNS_PUBLIC=tcp torsocks ./aurumcpud --p2p-bind-ip 127.0.0.1 --no-igd --rpc-bind-ip 127.0.0.1 \
     --data-dir /home/amnesia/Persistent/your/directory/to/the/blockchain
 ```
 
@@ -665,7 +665,7 @@ As of April 2022, the full AurumCPU blockchain file is about 130 GB. One can sto
 A pruned blockchain can only serve part of the historical chain data to other peers, but is otherwise identical in
 functionality to the full blockchain.
 To use a pruned blockchain, it is best to start the initial sync with `--prune-blockchain`. However, it is also possible
-to prune an existing blockchain using the `aurumcpu-blockchain-prune` tool or using the `--prune-blockchain` `monerod` option
+to prune an existing blockchain using the `aurumcpu-blockchain-prune` tool or using the `--prune-blockchain` `aurumcpud` option
 with an existing chain. If an existing chain exists, pruning will temporarily require disk space to store both the full
 and pruned blockchains.
 
@@ -686,7 +686,7 @@ Run the build.
 Once it stalls, enter the following command:
 
 ```bash
-gdb /path/to/monerod `pidof monerod`
+gdb /path/to/aurumcpud `pidof aurumcpud`
 ```
 
 Type `thread apply all bt` within gdb in order to obtain the stack trace
@@ -699,12 +699,12 @@ Enter `echo core | sudo tee /proc/sys/kernel/core_pattern` to stop cores from be
 
 Run the build.
 
-When it terminates with an output along the lines of "Segmentation fault (core dumped)", there should be a core dump file in the same directory as monerod. It may be named just `core`, or `core.xxxx` with numbers appended.
+When it terminates with an output along the lines of "Segmentation fault (core dumped)", there should be a core dump file in the same directory as aurumcpud. It may be named just `core`, or `core.xxxx` with numbers appended.
 
 You can now analyse this core dump with `gdb` as follows:
 
 ```bash
-gdb /path/to/monerod /path/to/dumpfile`
+gdb /path/to/aurumcpud /path/to/dumpfile`
 ```
 
 Print the stack trace with `bt`
@@ -717,11 +717,11 @@ coredumpctl -1 gdb
 
 #### To run AurumCPU within gdb:
 
-Type `gdb /path/to/monerod`
+Type `gdb /path/to/aurumcpud`
 
 Pass command-line options with `--args` followed by the relevant arguments
 
-Type `run` to run monerod
+Type `run` to run aurumcpud
 
 ### Analysing memory corruption
 
@@ -739,7 +739,7 @@ You can then run the aurumcpu tools normally. Performance will typically halve.
 
 #### valgrind
 
-Install valgrind and run as `valgrind /path/to/monerod`. It will be very slow.
+Install valgrind and run as `valgrind /path/to/aurumcpud`. It will be very slow.
 
 ### LMDB
 
@@ -765,8 +765,8 @@ These records are dumped as hex data, where the first line is the key and the se
 
 Because of the nature of the socket-based protocols that drive aurumcpu, certain protocol weaknesses are somewhat unavoidable at this time. While these weaknesses can theoretically be fully mitigated, the effort required (the means) may not justify the ends. As such, please consider taking the following precautions if you are a aurumcpu node operator:
 
-- Run `monerod` on a "secured" machine. If operational security is not your forte, at a very minimum, have a dedicated a computer running `monerod` and **do not** browse the web, use email clients, or use any other potentially harmful apps on your `monerod` machine. **Do not click links or load URL/MUA content on the same machine**. Doing so may potentially exploit weaknesses in commands which accept "localhost" and "127.0.0.1".
-- If you plan on hosting a public "remote" node, start `monerod` with `--restricted-rpc`. This is a must.
+- Run `aurumcpud` on a "secured" machine. If operational security is not your forte, at a very minimum, have a dedicated a computer running `aurumcpud` and **do not** browse the web, use email clients, or use any other potentially harmful apps on your `aurumcpud` machine. **Do not click links or load URL/MUA content on the same machine**. Doing so may potentially exploit weaknesses in commands which accept "localhost" and "127.0.0.1".
+- If you plan on hosting a public "remote" node, start `aurumcpud` with `--restricted-rpc`. This is a must.
 
 ### Blockchain-based
 
