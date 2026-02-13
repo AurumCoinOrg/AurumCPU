@@ -1146,6 +1146,7 @@ include(external/supercop/functions.cmake) # place after setting flags and befor
 add_subdirectory(contrib)
 add_subdirectory(src)
 
+include(cmake/aurumcpu_rebrand_tools.cmake)
 option(ENABLE_FUZZ_TEST "Enable fuzz testing." OFF)
 if(BUILD_TESTS)
   message(STATUS "Building tests")
